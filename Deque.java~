@@ -1,0 +1,160 @@
+import java.util.NoSuchElementException;
+import java.util.Iterator;
+
+/**
+ * 
+ * Here will be a discription
+ * 
+ * @author Ivanova Yulia
+ * 
+ */ 
+
+public class Deque<Item> implements Iterable<Item> {
+    private int n;                          // size of the queue
+    private Node first;                     // first item
+    private Node last;                      // last item
+        
+    // helper linked list class
+    private class Node {
+        private Item item;
+        private Node next;
+        private Node previous;
+    }
+    
+    /**
+     * Initialize an emptu deque.
+     * 
+     */
+    
+    public Deque() {
+        first = null;
+        last = null;
+        n = 0;    
+    }
+    
+    /**
+     * Is this deque empty?
+     * @return true if this deque is empty; false otherwise
+     */
+    public boolean isEmpty() {
+        return first == null && last == null;
+    }
+    
+    /**
+     * Returns the number of items in the deque.
+     * @return the number of items in the deque.
+     */
+    public int size() {
+        return n;
+    }
+    
+    /**
+     * Adds item at the top of the deque.
+     * @param item the item to add.
+     */
+    public void addFirst(Item item) {
+        if (!isEmpty()) {
+            Node oldfirst = first;
+            first = new Node();
+            first.item = item;
+            first.next = oldfirst;
+            oldfirst.previous = first;
+            n++;
+        } else { 
+            last = new Node();
+            last.item = item;
+            last = first;
+            n++;
+        }
+    }
+    
+    /**
+     * Adds item at the end of the deque.
+     * @param item the item to add.
+     */
+    public void addLast(Item item) {
+        if (isEmpty()) {
+            first = new Node();
+            first.item = item;
+            last = first;
+            n++;
+        } else {
+        Node oldlast = last;        
+        last = new Node();
+        last.item = item;
+        oldlast.next = last;
+        last.previous = oldlast;
+        n++;
+        }
+    }
+    
+    /**
+     * Removes and returns the item from the top of the deque
+     * @return the item from the top
+     * @throws java.util.NoSuchElementException if this deque is empty
+     */
+    public Item removeFirst() {
+        if (isEmpty()) throw new NoSuchElementException("Deque underflow");
+        Item item = first.item;
+        first = first.next;
+        first.previous = null;
+        n--;
+        return item;
+    }
+    
+    /**
+     * Removes and returns the item from the bottom of the deque
+     * @return the item from the bottom
+     * @throws java.util.NoSuchElementException if this deque is empty
+     */
+    //public Item removeLast() {
+    //    if (isEmpty()) throw new NoSuchElementException("Deque underflow");
+    //    Item item = last.item;
+        
+        
+    
+    /**
+     * Returns an iterator to this stack that iterates through the items in LIFO order.
+     * @return an iterator to this stack that iterates through the items in LIFO order.
+     */
+    public Iterator<Item> iterator() {
+        return new ListIterator();
+    }
+
+    // an iterator, doesn't implement remove() since it's optional
+    private class ListIterator implements Iterator<Item> {
+        private Node current = first;
+        public boolean hasNext()  { return current != null;                     }
+        public void remove()      { throw new UnsupportedOperationException();  }
+
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            Item item = current.item;
+            current = current.next; 
+            return item;
+        }
+    }
+    
+    
+     public String toString() {
+        StringBuilder s = new StringBuilder();
+        for (Item item : this)
+            s.append(item + " ");
+        return s.toString();
+    }
+     
+     
+     public static void main(String[] args) {
+     
+     Deque<Integer> deque = new Deque<Integer>();
+     System.out.println("Begin: " + deque.isEmpty() + " " + deque.toString() + " " + deque.size());
+     deque.addFirst(1);
+     System.out.println("1: " + deque.isEmpty() + " " + deque.toString() + " " + deque.size());
+     deque.addFirst(2);
+     System.out.println("2: " + deque.isEmpty() + " " + deque.toString() + " " + deque.size());
+
+     
+     
+     
+     }
+}
