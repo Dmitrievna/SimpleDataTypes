@@ -89,8 +89,8 @@ public class Deque<Item> implements Iterable<Item> {
             oldlast.next = last;
             last.previous = oldlast;
             n++;
-            //System.out.println("//first.item: " + first.item + " //first.next: " + first.next + "//first.previous: " + first.previous);
-            //System.out.println("//last.item: " + last.item + " //last.next: " + last.next + "//last.previous: " + last.previous);
+            // System.out.println("//first.item: " + first.item + " //first.next: " + first.next + "//first.previous: " + first.previous);
+            // System.out.println("//last.item: " + last.item + " //last.next: " + last.next + "//last.previous: " + last.previous);
         }
     }
     
@@ -150,18 +150,18 @@ public class Deque<Item> implements Iterable<Item> {
     }
     
     
-     public String toString() {
+  /*   public String toString() {
         StringBuilder s = new StringBuilder();
         for (Item item : this)
             s.append(item + " ");
         return s.toString();
-    }
+    }*/
      
      
      public static void main(String[] args) {
      
      Deque<Integer> deque = new Deque<Integer>();
-     System.out.println("Begin: " + deque.isEmpty() + " " + deque.toString() + " " + deque.size());
+     //System.out.println("Begin: " + deque.isEmpty() + " " + deque.toString() + " " + deque.size());
      deque.addLast(1);
      deque.removeFirst();
      deque.addFirst(2);
@@ -218,7 +218,7 @@ public class Deque<Item> implements Iterable<Item> {
      deque.removeFirst();
      deque.removeLast();
      deque.removeLast();
-     System.out.println(deque.isEmpty() + " " + deque.toString() + " " + deque.size());
+     //System.out.println(deque.isEmpty() + " " + deque.toString() + " " + deque.size());
      
      
 

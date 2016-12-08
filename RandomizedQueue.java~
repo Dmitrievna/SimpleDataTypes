@@ -61,21 +61,27 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    
    public Item dequeue() {
        if (this.isEmpty()) throw new NoSuchElementException();
-       final Random random = new Random();
-       int a = random.nextInt(this.size());
-       if (a == 0) { a++; }
-       Node itemBuf = null;
-       Node item = first;
-       while (a != 0) {
-           if (a == 1) { itemBuf = item; }
-           item = item.next;
-           a--;
-       }
        
-       if (this.size() != 1) { itemBuf.next = item.next; }
-       n--;
-       return item.item;
-
+       if ( this.size() == 1) { 
+           n--;
+           return first.item;
+           
+       }
+       else
+       {
+           final Random random = new Random();
+           int a = random.nextInt(this.size());
+           Node itemBuf = null;
+           Node item = first;
+           do {
+               if (a == 1) { itemBuf = item; }
+               item = item.next;
+               a--;
+           } while (a > 0);
+           if (this.size() != 1) { itemBuf.next = item.next; }
+           n--;
+           return item.item;
+       }
    }
    
    /**
@@ -121,14 +127,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             return item;
         }
     }    
-    
+ /*   
   public String toString() {
         StringBuilder s = new StringBuilder();
         for (Item item : this)
             s.append(item + " ");
         return s.toString();   
    }
-  
+  */
    public static void main(String[] args) {
    
        RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();

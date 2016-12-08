@@ -1,168 +1,180 @@
-import java.util.Random;
+/**
+ * Here will be a description
+ */
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import edu.princeton.cs.algs4.StdRandom;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
-   private int n;                           // size of queue
-   private Node first;                      // first element of queque
-   
-   private class Node {                     // supporting class
-       private Node next;                           // next item
-       private Item item;                           // current item
-   }
-   
+    private Item[] a;       // array of Items
+    private int n;          // number of elements in the queue
+    
+    
     /**
-    * Initialize an empty RandomizedQueque.
-    */
-   
-   public RandomizedQueue() {
-       n = 0;
-       first = null;
-   }
-   
-   /**
-    * Is this queque is empty?
-    * @return true if queque is empty; false otherwise
-    */
-   
-   public boolean isEmpty() {
-       return n == 0;
-   }
-   
-   /**
-    * Returns the number of items in queue
-    * @return the number of items in queue
-    */
-   
-   public int size() {
-       return n;
-   }
-   
-   /**
-    * Adds item in the queue
-    * @param is item to add
-    */ 
-      
-   public void enqueue(Item item) {
-       if (item == null) { throw new NullPointerException(); }
-       Node oldfirst = first;
-       first = new Node();
-       first.item = item;
-       first.next = oldfirst;
-       n++;
-   
-   
-   }
-   
-   /**
-    * Removes and returns a random item
-    * @return a random item
-    */
-   
-   public Item dequeue() {
-       if (this.isEmpty()) throw new NoSuchElementException();
-       
-       if ( this.size() == 1) { 
-           n--;
-           return first.item;
-           
-       }
-       else
-       {
-           final Random random = new Random();
-           int a = random.nextInt(this.size());
-           Node itemBuf = null;
-           Node item = first;
-           do {
-               if (a == 1) { itemBuf = item; }
-               item = item.next;
-               a--;
-           } while (a > 0);
-           if (this.size() != 1) { itemBuf.next = item.next; }
-           n--;
-           return item.item;
-       }
-   }
-   
-   /**
-    * Returns (but do not remove) a random item
-    * @return (but do not remove) a random item
-    */ 
+     * Initiliazes an empty stack.
+     */
+    public RandomizedQueue() {
+        a = (Item[]) new Object[2];
+        n = 0;
+    }
+    
+    /**
+     * Is this queue empty?
+     * @return true if this queue is empty; false otherwise
+     */
+    public boolean isEmpty() {
+        return n == 0;
+    }
+    
+    /**
+     * Returns number of items in the queue.
+     * @return number of items in the queue
+     */
+    public int size() {
+        return n;
+    }
+    
+    // resize undelying array holding the elements
+    private void resize(int capacity) {
+        // textbook implementation
+        @SuppressWarnings("unchecked")
+        Item[] temp = (Item[]) new Object[capacity];
+       // Item[] temp = new Item[capacity];
+        for (int i = 0; i < n; i++) {
+            temp[i] = a[i];
+        }
+        a = temp;
+    }
+    
+    /**
+     * add an item to the queue.
+     * @param is an item to add
+     */
+    public void enqueue(Item item) {
+        if (item == null) throw new NullPointerException();
+        if (n == a.length) resize(2*a.length);     // double size of array if necessary
+        a[n++] = item;                             // add item
+    }
+        
+    /**
+     * Removes and returns the random item from the queue.
+     * @return the random item from the queue
+     * @throws java.util.NoSuchElementException if there is no elements in the queue
+     */
+    public Item dequeue() {
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        StdRandom.shuffle(a, 0, n-1);
+        Item item = a[n-1];
+        a[n - 1] = null;
+        n--;
+        // shrink array if necessary 
+        if (n > 0 && n == a.length/4) resize(a.length/2);
+        return item;
+    }
+    
+    /**
+     * Returns but not remove an item from the queue.
+     * @return item to show.
+     * @throws java.util.NoSuchElementException if this stack is empty
+     */
+    public Item sample() {
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        return a[StdRandom.uniform(0,n)];        
+    }
+    
+    
+    /**
+     * Returns an iterator to this stack that iterates through the items in LIFO order.
+     * @return an iterator to this stack that iterates through the items in LIFO order.
+     */
+    public Iterator<Item> iterator() {
+        return new ReverseArrayIterator();
+    }
 
+    // an iterator, doesn't implement remove() since it's optional
+    private class ReverseArrayIterator implements Iterator<Item> {
+        private int i;
 
-   public Item sample() {
-       if (this.isEmpty()) throw new NoSuchElementException();
-       final Random random = new Random();
-       int a = random.nextInt(this.size());
-       Node item = first;
-       while (a != 0) {
-           item = item.next;
-           a--;
-       }
-       return item.item;
-   
-   
-   
-   }                    
-   
-   
-   /** 
-    * Returns an independent iterator over items in random order
-    * @return an independent iterator over items in random order
-    */
-   
-   public Iterator<Item> iterator() {        // return an independent iterator over items in random order
-       return new QueueIterator();
-   }
-       
-   private class QueueIterator implements Iterator<Item> { 
-        private Node current = first;
-        public boolean hasNext()  { return current != null;                     }
-        public void remove()      { throw new UnsupportedOperationException();  }
+        public ReverseArrayIterator() {
+            i = n-1;
+            StdRandom.shuffle(a, 0, n-1);
+        }
+
+        public boolean hasNext() {
+            return i >= 0;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
 
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException();
-            Item item = current.item;
-            current = current.next; 
-            return item;
+            
+            return a[i--];
         }
-    }    
- /*   
-  public String toString() {
+    }
+        
+     /**
+     * Returns a string representation of this queue.
+     * @return the sequence of items in the stack in LIFO order, separated by spaces
+     */
+ /*   public String toString() {
         StringBuilder s = new StringBuilder();
         for (Item item : this)
             s.append(item + " ");
-        return s.toString();   
-   }
-  */
-   public static void main(String[] args) {
-   
-       RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
-       
+        return s.toString();
+    }*/
+    
+    public static void main(String[] args) {
+        RandomizedQueue<Integer> queue = new RandomizedQueue<Integer>();
+       // System.out.println("Begin: " + queue.toString() + " isEmpty: " + queue.isEmpty() + " elements: " + queue.size());
+        queue.enqueue(1);
+        queue.enqueue(2);
+        queue.enqueue(3);
+        queue.enqueue(4);
+        //System.out.println("1: " + queue.toString() + " isEmpty: " + queue.isEmpty() + " elements: " + queue.size());
+       // System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        queue.enqueue(5);
+        queue.enqueue(6);
+        queue.enqueue(7);
+        queue.enqueue(8);
+        /*System.out.println("1: " + queue.toString() + " isEmpty: " + queue.isEmpty() + " elements: " + queue.size());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());*/
+        queue.enqueue(9);
+        queue.enqueue(10);
+        queue.enqueue(11);
+        queue.enqueue(12);
+       // System.out.println("1: " + queue.toString() + " isEmpty: " + queue.isEmpty() + " elements: " + queue.size());
+       // System.out.println("Dequeue: " + queue.dequeue() + " elements: " + queue.toString());
+        queue.enqueue(13);
+        queue.enqueue(14);
+        queue.enqueue(15);
+        queue.enqueue(16);
+        //System.out.println("Elements: " + queue.toString());
+       /* Iterator itr1 = queue.iterator();
+        Iterator itr2 = queue.iterator();
+        while (itr1.hasNext() && itr2.hasNext()) {
+            Object element1 = itr1.next();
+            Object element2 = itr2.next();
+            System.out.println(element1 + " " + element2);
+      
+        }*/
+        
+        
+    }
+    
 
-       rq.isEmpty();
-       rq.size();
-       rq.size();
-       rq.enqueue(1);
-       rq.dequeue();
-       System.out.println(rq.toString()); 
-       System.out.println(rq.size());
-       System.out.println(rq.toString()); 
-       System.out.println(rq.sample());
-       System.out.println(rq.toString()); 
-       System.out.println(rq.sample());
-       System.out.println(rq.toString()); 
-       System.out.println(rq.sample());
-       System.out.println(rq.toString()); 
-       System.out.println(rq.sample());
-       System.out.println(rq.toString()); 
-       rq.enqueue(45);
-       System.out.println(rq.toString()); 
-       System.out.println(rq.sample()); 
-       System.out.println(rq.dequeue());
-       
-       System.out.println(rq.toString());                   
-   
-       
-   }   // unit testing
+        
+        
+
+
+
 }
